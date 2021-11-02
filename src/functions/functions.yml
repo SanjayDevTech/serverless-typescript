@@ -1,0 +1,9 @@
+Hello:
+  handler: src/functions/hello/handler.main
+  name: ${self:custom.newService}-hello
+  events:
+    - http:
+        method: GET
+        path: /
+        cors:
+          origin: "*"

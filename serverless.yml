@@ -1,0 +1,47 @@
+service: serverless-typescript
+frameworkVersion: "2"
+
+custom:
+  newService: ${self:service}
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: true
+    exclude:
+      - aws-sdk
+    target: node14
+    define:
+      "require.resolve": undefined
+    platform: node
+  webpack:
+    webpackConfig: "./webpack.config.js"
+    includeModules: true
+
+  POOL_ID: sample-id
+
+plugins:
+  - serverless-esbuild
+  - serverless-webpack
+  - serverless-offline
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ap-south-1
+  stage: dev
+  apiGateway:
+    minimumCompressionSize: 1024
+    shouldStartNameWithService: true
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000"
+    USER_POOL: ${self:custom.POOL_ID}
+    REGION: ${self:provider.region}
+  lambdaHashingVersion: "20201221"
+
+# resources:
+#   Resources: ${file(src/resources.yml)}
+
+functions:
+  - ${file(src/functions/functions.yml)}
